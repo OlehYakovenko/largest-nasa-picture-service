@@ -2,6 +2,7 @@ package com.bobocode.largestnasapictureservice.controller;
 
 import com.bobocode.largestnasapictureservice.service.LargestNasaPictureService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

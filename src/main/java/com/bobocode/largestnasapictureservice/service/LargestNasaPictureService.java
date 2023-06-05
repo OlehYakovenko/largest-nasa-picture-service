@@ -3,7 +3,9 @@ package com.bobocode.largestnasapictureservice.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -13,6 +15,7 @@ import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class LargestNasaPictureService {
     private final RestTemplate restTemplate;
     @Value("${nasa.base.url}")
@@ -21,6 +24,7 @@ public class LargestNasaPictureService {
     private String nasaApiKey;
 
     //build url
+    @Cacheable("picture")
     public String getLargestNasaPictureUrl(int sol) {
         var url = UriComponentsBuilder.fromHttpUrl(nasaBaseUrl)
                 .queryParam("sol", sol)
@@ -34,6 +38,7 @@ public class LargestNasaPictureService {
 
         return imageUrls.parallelStream()
                 .map(pictureUrl -> {
+                    log.info("Calling " + pictureUrl);
                     var initialHeader = restTemplate.headForHeaders(pictureUrl);
                     var redirectHeaders = restTemplate.headForHeaders(initialHeader.getLocation());
                     var imageSize = redirectHeaders.getContentLength();
